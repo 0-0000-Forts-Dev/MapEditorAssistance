@@ -1,0 +1,143 @@
+-- Copyright (c) [0-0000]. Licensed under MIT.
+-- Please do not remove this notice.
+-- 请勿删除上述版权声明
+dofile("scripts/forts.lua")
+
+local IgnoredDevices = {
+	["reactor"] = true,
+	["derrick"] = true,
+}
+
+Materials = {}
+local function GetMaterialInfo(saveName)
+	Materials[saveName] = {
+		["HitPoints"] = GetMaterialValue(saveName, 0, COMMANDER_INACTIVE, "HitPoints", 100),
+		["MetalRepairCost"] = GetMaterialValue(saveName, 0, COMMANDER_INACTIVE, "MetalRepairCost", 0),
+		["MetalBuildCost"] = GetMaterialValue(saveName, 0, COMMANDER_INACTIVE, "MetalBuildCost", 0),
+		["EnergyBuildCost"] = GetMaterialValue(saveName, 0, COMMANDER_INACTIVE, "EnergyBuildCost", 0),
+		["EnergyRunCost"] = GetMaterialValue(saveName, 0, COMMANDER_INACTIVE, "EnergyRunCost", 0),
+		["Invulnerable"] = GetMaterialValue(saveName, 0, COMMANDER_INACTIVE, "Invulnerable", false),
+	}
+end
+local StructureDataResults = {
+	-- the resources used to construct the structure
+	-- include device costs(except reactor and derrick)
+	-- ignore foundation costs
+	-- ignore invulnerable materials
+	metal = 0,
+	energy = 0,
+	-- the energy consuming rate to run all energy-consuming links in the structure
+	energyrun = 0,
+	-- the number of all the nodes(include segmented nodes and foundations) in the strcuture
+	nodes=0,
+	-- the number of all the foundations in the strcuture
+	foundations=0,
+	-- the number of all the links(include segmented links) in the strcuture
+	links=0,
+	-- the original length(ignore compression/expansion) of all the links in the strcuture
+	-- ignore invulnerable materials
+	lengtho=0,
+	-- the actual length(consider compression/expansion) of all the links in the strcuture
+	-- ignore invulnerable materials
+	length=0,
+	-- the actual length of all the invulnerable links in the strcuture
+	lengthb=0,
+	-- the number of all devices in the strcuture
+	devices=0,
+	seen={},
+}
+LinkCallBack = function(nodeA, nodeB, linkPos, saveName)
+	if not Materials[saveName] then GetMaterialInfo(saveName) end
+	local sdr = StructureDataResults
+	sdr.seen[nodeA] = true
+	sdr.seen[nodeB] = true
+	sdr.links = sdr.links + 1
+
+	-- ignore invulnerable links
+	if not Materials[saveName].Invulnerable then
+		-- if dlc2 isn't active, regard the actual length as the original length
+		local length = Vec3Dist(NodePosition(nodeA),NodePosition(nodeB))
+		sdr.length = sdr.length + length
+		if dlc2Var_Active then
+			local health, damaged = GetLinkHealth(nodeA, nodeB)
+			if health > 0.7 then
+				damaged = true
+				-- use damge-repair to calculate the original length
+				dlc2_ApplyDamageToLink(nodeA, nodeB, Materials[saveName].HitPoints*0.5, 0, LINKBREAK_DELETE)
+				health = health - 0.5
+			end
+			length = GetLinkRepairCost(nodeA, nodeB).metal/(1-health)/Materials[saveName].MetalRepairCost
+			if damaged then
+				dlc2_ApplyDamageToLink(nodeA, nodeB, Materials[saveName].HitPoints*-0.5, 0, LINKBREAK_DELETE)
+			end
+		end
+		sdr.lengtho = sdr.lengtho + length
+		sdr.energyrun = sdr.energyrun + length*Materials[saveName].EnergyRunCost
+		sdr.metal = sdr.metal + length*Materials[saveName].MetalBuildCost
+		sdr.energy = sdr.energy + length*Materials[saveName].EnergyBuildCost
+	else
+		sdr.lengthb = sdr.lengthb + Vec3Dist(NodePosition(nodeA),NodePosition(nodeB))
+	end
+	return true
+end
+local function GetStructureData(structureId)
+	StructureDataResults = {metal=0,energy=0,energyrun=0,nodes=0,foundations=0,links=0,lengtho=0,length=0,lengthb=0,seen={},devices=0}
+	local sdr = StructureDataResults
+	local teamId = GetStructureTeam(structureId)
+	EnumerateStructureLinks(teamId, structureId, "LinkCallBack", true)
+	for nodeId, _ in pairs(sdr.seen) do
+		sdr.nodes = sdr.nodes+1
+		if IsFoundation(nodeId) then sdr.foundations = sdr.foundations + 1 end
+	end
+	sdr.seen = nil
+	for i=0, GetDeviceCount(teamId)-1 do
+		local deviceId = GetDeviceId(teamId, i)
+		if GetDeviceStructureId(deviceId) == structureId then
+			sdr.devices = sdr.devices + 1
+			local saveName = GetDeviceType(deviceId)
+			if not IgnoredDevices[saveName] then
+				local cost = GetDeviceCost(saveName)
+				sdr.metal = sdr.metal + cost.metal
+				sdr.energy = sdr.energy + cost.energy
+			end
+		end
+	end
+	return DeepCopy(sdr)
+end
+
+local ctrlState = false
+function OnKey(key, down)
+	if down then
+		if key == "left control" then
+			ctrlState = true
+		elseif ctrlState and key == "m" then
+			local id = GetLocalSelectedNodeId()
+			if id ~= -1 then
+				local structureId = NodeStructureId(id)
+				local res = GetStructureData(structureId)
+				if dlc2Var_Active then
+					Log(string.format("Structure %d: %.1fm, %.1fe, %.1fe-, N %d, F %d, L %.1f, lenO %.1f, len %.1f, lenB %.1f, D %d",structureId,res.metal,res.energy,res.energyrun,res.nodes,res.foundations,res.links,res.lengtho,res.length,res.lengthb,res.devices))
+				else
+					Log(string.format("*Structure %d: %.1fm, %.1fe, %.1fe-, N %d, F %d, L %.1f, len %.1f, lenB %.1f, D %d",structureId,res.metal,res.energy,res.energyrun,res.nodes,res.foundations,res.links,res.length,res.lengthb,res.devices))
+				end
+			end
+		end
+	else
+		if key == "left control" then
+			ctrlState = false
+		end
+	end
+end
+function Load(gameStart)
+	if GetGameMode() ~= "Editor" then
+		Log("Error: Map Editor Assistance: Editor mode expected. Please don't load this mod in other modes.")
+	else
+		Log("Map Editor Assistance: Thanks for your use. Hope this mod will help your map edit.")
+		Log("Usage: Select a node and press Ctrl+M.")
+		if dlc2Var_Active then
+			Log("DLC2 is enabled. You can use this mod fluently.")
+		else
+			Log("Error: DLC2 isn't enabled. You will get weakened features.")
+		end
+	end
+end
