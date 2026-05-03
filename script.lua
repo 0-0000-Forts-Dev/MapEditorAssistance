@@ -80,7 +80,7 @@ LinkCallBack = function(nodeA, nodeB, linkPos, saveName)
 	end
 	return true
 end
-local function GetStructureData(structureId)
+function GetStructureData(structureId)
 	StructureDataResults = {metal=0,energy=0,energyrun=0,nodes=0,foundations=0,links=0,lengtho=0,length=0,lengthb=0,seen={},devices=0}
 	local sdr = StructureDataResults
 	local teamId = GetStructureTeam(structureId)
@@ -105,12 +105,28 @@ local function GetStructureData(structureId)
 	return DeepCopy(sdr)
 end
 
+function ClearIsolatedNodes()
+	for _, sideId in ipairs({-3,0,1,2}) do
+		local nodes_todestroy = {}
+		for i=0, NodeCount(sideId)-1 do
+			local nodeId = GetNodeId(sideId, i)
+			if NodeLinkCount(nodeId)==0 then
+				nodes_todestroy[#nodes_todestroy+1] = nodeId
+			end
+		end
+		for _, nodeId in ipairs(nodes_todestroy) do
+			DestroyNode(NodeTeam(nodeId), nodeId)
+		end
+	end
+end
+
 local ctrlState = false
 function OnKey(key, down)
 	if down then
 		if key == "left control" then
 			ctrlState = true
-		elseif ctrlState and key == "m" then
+		elseif key == "m" then
+		if ctrlState then
 			local id = GetLocalSelectedNodeId()
 			if id ~= -1 then
 				local structureId = NodeStructureId(id)
@@ -121,6 +137,9 @@ function OnKey(key, down)
 					Log(string.format("*Structure %d: %.1fm, %.1fe, %.1fe-, N %d, F %d, L %.1f, len %.1f, lenB %.1f, D %d",structureId,res.metal,res.energy,res.energyrun,res.nodes,res.foundations,res.links,res.length,res.lengthb,res.devices))
 				end
 			end
+		end
+		elseif key == "n" then
+			ClearIsolatedNodes()
 		end
 	else
 		if key == "left control" then
@@ -133,7 +152,8 @@ function Load(gameStart)
 		Log("Error: Map Editor Assistance: Editor mode expected. Please don't load this mod in other modes.")
 	else
 		Log("Map Editor Assistance: Thanks for your use. Hope this mod will help your map edit.")
-		Log("Usage: Select a node and press Ctrl+M.")
+		Log("Ctrl+M: Get some information about the structure which the selected node belongs to.")
+		Log("Ctrl+N: Clear all isolated nodes.")
 		if dlc2Var_Active then
 			Log("DLC2 is enabled. You can use this mod fluently.")
 		else

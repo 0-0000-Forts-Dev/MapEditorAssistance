@@ -14,6 +14,8 @@
 
 4. When you select a node, you can press **Ctrl+M** to get some basic information about the structure where the node is located in the log.
 
+5. You can press **Ctrl+N** to clear all isolated nodes(without any links).
+
 ### Structure Information
 
 The results are output through the console log(`Log`).
@@ -72,6 +74,8 @@ It's okay to make your own revised versions of this mod and even **publish them 
 
 4. 当你选中节点时，可以按 **Ctrl+M** 来在日志输出中获取该节点所在结构的基本信息
 
+5. 按 **Ctrl+N** 清除所有孤立节点(没有连接的节点)
+
 ### 结构信息
 
 结果通过控制台输出(`Log`)，格式如下：`Structure $: $m, $e, $e-, N $, F $, L $, lenO $, len $, lenB $, D $`，其中每个 `$` 符号对应相关数值，具体如下：
@@ -106,7 +110,7 @@ It's okay to make your own revised versions of this mod and even **publish them 
 
 ## 注意事项
 
-- 不要在非编辑模式下使用该模组，它会改变部分游戏数据如材料的金属维修消耗和生命值
+- 不要在非编辑模式下使用该模组，它会改变部分游戏数据
 
 - 在完成编辑发布地图前，请先将本模组从地图文件中移除(在 `Mods` 中将该模组名移除)
 
