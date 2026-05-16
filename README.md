@@ -10,11 +10,13 @@
 
 2. For ground devices(`BuildOnGroundOnly=true`), if it has `PopulationCap`, let it *100.
 
-3. all the `Prerequisite` of materials are removed.
+3. All the `Prerequisite` of materials are removed.
 
 4. When you select a node, you can press **Ctrl+M** to get some basic information about the structure where the node is located in the log.
 
 5. You can press **Ctrl+N** to clear all isolated nodes(without any links).
+
+6. Add a **Block Setting Interface** which enables you to change block values visually, instead of the complex shorcuts.
 
 ### Structure Information
 
@@ -50,6 +52,16 @@ The output format: `Structure $: $m, $e, $e-, N $, F $, L $, lenO $, len $, lenB
 > 
 > The metal/energy cost of links is estimated by the actual length of each link, which could be **overestimated or underestimated**, depeding on whether the structure is compressed or stretched.
 
+### Block Setting Interface
+
+The interface shows when you select any blocks and hides when you have no block selection. It can modify the flags and owner of selected blocks. However, you might take these notes:
+
+1. The show/hide switch has an unstable **delay**, which might reach 2 seconds. Just be patient.
+
+2. Forts may add a new vertex for a block when you click the buttons in some cases. That will change the selected block' shape, but this mod will withdraw the new created vertex and restore the block.
+
+3. **Don't apply the buttons for new block**(the new block before losing focus). In that case this mod won't restore its shape. Undo if that happens. To easily use the interface for the block, you can **right click the block** to reselect the block.
+
 ## Precautions
 
 - Don't load this mod in non-edit modes, as it changed some game datas.
@@ -75,6 +87,18 @@ It's okay to make your own revised versions of this mod and even **publish them 
 4. 当你选中节点时，可以按 **Ctrl+M** 来在日志输出中获取该节点所在结构的基本信息
 
 5. 按 **Ctrl+N** 清除所有孤立节点(没有连接的节点)
+
+6. 新增一个**地形块设置界面**，让你可以可视化地修改地形块属性而不需要使用复杂的快捷键
+
+### 地形块设置界面
+
+该界面会在你选中任何地形块时显示并在未选中地形块时隐藏，它可以修改地形块标志和所有者。不过你需要注意以下事项：
+
+1. 界面的显示/隐藏过程有不稳定的**延迟**，可多达 2 秒
+
+2. Forts 在某些情况下会在你点击该界面按钮时为地形块新增节点，这会改变地形块的形状，不过本模组会删除新增的那个节点并复原地形块
+
+3. **不要对新地形块直接使用本界面**(在失去焦点前的新地形块)，那样模组就不会复原地形块形状了，这是你应该撤销操作。要便捷的对这样的地形块使用本界面，你可以**右击这个地形块**重新选择这个块。
 
 ### 结构信息
 

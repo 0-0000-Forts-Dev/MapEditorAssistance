@@ -167,8 +167,6 @@ function UpdateBlockSelection()
 		BlockSettingEnabled = false
 	end
 end
----[[
-local cnt = 1
 function OnControlActivated(name, code, doubleClick)
 	-- MEA-BF_$FLAG$-$T/F$
 	if string.sub(name, 1, 7)=="MEA-BF_" then
@@ -205,7 +203,6 @@ function OnControlActivated(name, code, doubleClick)
 		end
 	end
 end
---]]
 
 local ctrlState = false
 function OnKey(key, down)
@@ -240,6 +237,7 @@ function Load(gameStart)
 		Log("Error: Map Editor Assistance: Editor mode expected. Please don't load this mod in other modes.")
 	else
 		Log("Map Editor Assistance: Thanks for your use. Hope this mod will help your map edit.")
+		Log("See the original Repos: github.com/0-0000-Forts-Dev/MapEditorAssistance")
 		Log("Ctrl+M: Get some information about the structure which the selected node belongs to.")
 		Log("Ctrl+N: Clear all isolated nodes.")
 		if dlc2Var_Active then
