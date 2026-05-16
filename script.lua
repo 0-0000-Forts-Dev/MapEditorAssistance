@@ -120,8 +120,96 @@ function ClearIsolatedNodes()
 	end
 end
 
+BlockFlags = {
+	Foundations = 1<<0,
+	Mines = 1<<8,
+	WaterLevel = 1<<9,
+	EdgeWithFill = 1<<11,
+	--OilDrills = 1<<16,
+	--OilRigs = 1<<24,
+	PassProjectiles = 1<<25,
+	PassBeams = 1<<26,
+	Hazard = 1<<27,
+	NoSplash = 1<<28,
+	NoBuild = 1<<29,
+	CanBuildOver = 1<<30,
+	NoDrawEdges = 1<<31,
+}
+BlockOwner = {
+	Background = -2,
+	Any = -1,
+	None = 0,
+	Team1 = 1,
+	Team2 = 2,
+}
+
+BlockSelection = {
+	-- [i] = blockIndex,
+	-- When only one block is selected: Whether the block has made an 'undo' and won't create new vertexs for further clicks
+	-- Can be true only when #it = 1
+	still = false,
+}
+BlockSettingEnabled = false
+function UpdateBlockSelection()
+	local selects = GetBlockSelectionCount()
+	-- Keep it true exactly when the selection has no changes
+	if not(BlockSelection.still and selects == 1 and GetBlockSelection(0) == BlockSelection[1]) then
+		BlockSelection.still = false
+	end
+	for i = 1, #BlockSelection do BlockSelection[i] = nil end
+	for i = 1, selects do BlockSelection[i] = GetBlockSelection(i-1) end
+	-- There is an unstable delay of a bit seconds for switch
+	if not BlockSettingEnabled and selects > 0 then
+		ShowControl("MapEditorAssistance", "MEA-BlockSetting", true)
+		BlockSettingEnabled = true
+	elseif BlockSettingEnabled and selects == 0 then
+		ShowControl("MapEditorAssistance", "MEA-BlockSetting", false)
+		BlockSettingEnabled = false
+	end
+end
+---[[
+local cnt = 1
+function OnControlActivated(name, code, doubleClick)
+	-- MEA-BF_$FLAG$-$T/F$
+	if string.sub(name, 1, 7)=="MEA-BF_" then
+		local selects = #BlockSelection
+		if selects > 0 then
+			local flag = string.sub(name, 8, -3)
+			local value = string.sub(name, -1)=="T"
+			for i = 0, selects-1 do
+				local blockIndex = GetBlockSelection(i)
+				if selects == 1 and not BlockSelection.still then
+					DeleteBlockVertex(blockIndex, 1)
+					BlockSelection.still = true
+					UpdateGroundTriangles()
+				end
+				SetBlockFlags(blockIndex, BlockFlags[flag], value)
+			end
+			MakeUndoLevel()
+		end
+	-- MEA-BO_$Owner$
+	elseif string.sub(name, 1, 7)=="MEA-BO_" then
+		local selects = #BlockSelection
+		if selects > 0 then
+			local owner = string.sub(name, 8)
+			for i = 0, selects-1 do
+				local blockIndex = GetBlockSelection(i)
+				if selects == 1 and not BlockSelection.still then
+					DeleteBlockVertex(blockIndex, 1)
+					BlockSelection.still = true
+					UpdateGroundTriangles()
+				end
+				SetBlockOwner(blockIndex, BlockOwner[owner])
+			end
+			MakeUndoLevel()
+		end
+	end
+end
+--]]
+
 local ctrlState = false
 function OnKey(key, down)
+	UpdateBlockSelection()
 	if down then
 		if key == "left control" then
 			ctrlState = true
@@ -159,5 +247,13 @@ function Load(gameStart)
 		else
 			Log("Error: DLC2 isn't enabled. You will get weakened features.")
 		end
+		if Language() == "Chinese" then
+			AddStrings(path.."/db/strings_Chinese.lua")
+		else
+			AddStrings(path.."/db/strings_English.lua")
+		end
+		LoadControl(path.."/ui/screens/BlockSetting.lua", "root")
+		ShowControl("MapEditorAssistance", "MEA-BlockSetting", false)
+		BlockSettingEnabled = false
 	end
 end
