@@ -1,12 +1,5 @@
 Root = {
 	Type = "Control",
-	Name = "MapEditorAssistance",
-	Style = "Normal",
-	Position = {0, 0},
-	Size = {0, 0},
-	Children = {{
-
-	Type = "Control",
 	Name = "MEA-BlockSetting",
 	Style = "Normal",
 	Position = {900, 30},
@@ -448,5 +441,4 @@ Root = {
 			},
 		},
 	},
-	}},
 }

@@ -104,6 +104,15 @@ function GetStructureData(structureId)
 	end
 	return DeepCopy(sdr)
 end
+function LogStructureData(structureId)
+	local res = GetStructureData(structureId)
+	if dlc2Var_Active then
+		Notice(string.format("Structure %d: %.1fm, %.1fe, %.1fe-, N %d, F %d, L %.1f, lenO %.1f, len %.1f, lenB %.1f, D %d",structureId,res.metal,res.energy,res.energyrun,res.nodes,res.foundations,res.links,res.lengtho,res.length,res.lengthb,res.devices))
+	else
+		Notice(string.format("*Structure %d: %.1fm, %.1fe, %.1fe-, N %d, F %d, L %.1f, len %.1f, lenB %.1f, D %d",structureId,res.metal,res.energy,res.energyrun,res.nodes,res.foundations,res.links,res.length,res.lengthb,res.devices))
+	end
+	return res
+end
 
 function ClearIsolatedNodes()
 	for _, sideId in ipairs({-3,0,1,2}) do
@@ -142,6 +151,12 @@ BlockOwner = {
 	Team1 = 1,
 	Team2 = 2,
 }
+StructureOwner = {
+	Background = -1,
+	None = 0,
+	Team1 = 1,
+	Team2 = 2,
+}
 
 BlockSelection = {
 	-- [i] = blockIndex,
@@ -150,6 +165,7 @@ BlockSelection = {
 	still = false,
 }
 BlockSettingEnabled = false
+
 function UpdateBlockSelection()
 	local selects = GetBlockSelectionCount()
 	-- Keep it true exactly when the selection has no changes
@@ -158,16 +174,43 @@ function UpdateBlockSelection()
 	end
 	for i = 1, #BlockSelection do BlockSelection[i] = nil end
 	for i = 1, selects do BlockSelection[i] = GetBlockSelection(i-1) end
-	-- There is an unstable delay of a bit seconds for switch
+	-- Note the display state won't be applied until further key inputs
 	if not BlockSettingEnabled and selects > 0 then
-		ShowControl("MapEditorAssistance", "MEA-BlockSetting", true)
+		ShowControl("root", "MEA-BlockSetting", true)
 		BlockSettingEnabled = true
 	elseif BlockSettingEnabled and selects == 0 then
-		ShowControl("MapEditorAssistance", "MEA-BlockSetting", false)
+		ShowControl("root", "MEA-BlockSetting", false)
 		BlockSettingEnabled = false
 	end
 end
+StructureSelection = nil
+StructureSettingEnabled = false
+function UpdateStructureSelection()
+	local id = GetLocalSelectedNodeId()
+	local structureId = nil
+	if id > 0 then
+		structureId = NodeStructureId(id)
+	else
+		id = GetLocalSelectedDeviceId()
+		if id ~= -1 then
+			id = GetDeviceStructureId(id)
+			if id ~= 0 then structureId = id end
+		end
+	end
+	if not StructureSettingEnabled and structureId then
+		ShowControl("root", "MEA-StructureSetting", true)
+		StructureSettingEnabled = true
+	elseif StructureSettingEnabled and not structureId then
+		ShowControl("root", "MEA-StructureSetting", false)
+		StructureSettingEnabled = false
+	end
+	StructureSelection = structureId
+	if not structureId then structureId = -1 end
+	SetControlText("MEA-StructureSetting", "MEA-SI_StructureId", "id: "..structureId)
+end
+
 function OnControlActivated(name, code, doubleClick)
+	if GameMode ~= "Editor" then return end
 	-- MEA-BF_$FLAG$-$T/F$
 	if string.sub(name, 1, 7)=="MEA-BF_" then
 		local selects = #BlockSelection
@@ -201,30 +244,34 @@ function OnControlActivated(name, code, doubleClick)
 			end
 			MakeUndoLevel()
 		end
+	-- MEA-SO-$Owner$
+	elseif string.sub(name, 1, 7)=="MEA-SO_" then
+		if StructureSelection then
+			local owner = string.sub(name, 8)
+			dlc2_ConvertStructure(StructureSelection, StructureNodeAtIndex(StructureSelection, 0), GetStructureTeam(StructureSelection), StructureOwner[owner])
+			MakeUndoLevel()
+		end
+	elseif name == "MEA-SE_CollentInformation" then
+		if StructureSelection then LogStructureData(StructureSelection) end
 	end
 end
 
 local ctrlState = false
 function OnKey(key, down)
+	if GameMode ~= "Editor" then return end
 	UpdateBlockSelection()
+	UpdateStructureSelection()
 	if down then
 		if key == "left control" then
 			ctrlState = true
 		elseif key == "m" then
-		if ctrlState then
-			local id = GetLocalSelectedNodeId()
-			if id ~= -1 then
-				local structureId = NodeStructureId(id)
-				local res = GetStructureData(structureId)
-				if dlc2Var_Active then
-					Log(string.format("Structure %d: %.1fm, %.1fe, %.1fe-, N %d, F %d, L %.1f, lenO %.1f, len %.1f, lenB %.1f, D %d",structureId,res.metal,res.energy,res.energyrun,res.nodes,res.foundations,res.links,res.lengtho,res.length,res.lengthb,res.devices))
-				else
-					Log(string.format("*Structure %d: %.1fm, %.1fe, %.1fe-, N %d, F %d, L %.1f, len %.1f, lenB %.1f, D %d",structureId,res.metal,res.energy,res.energyrun,res.nodes,res.foundations,res.links,res.length,res.lengthb,res.devices))
-				end
+			if ctrlState then
+				if StructureSelection then LogStructureData(StructureSelection) end
 			end
-		end
 		elseif key == "n" then
-			ClearIsolatedNodes()
+			if ctrlState then
+				ClearIsolatedNodes()
+			end
 		end
 	else
 		if key == "left control" then
@@ -233,7 +280,8 @@ function OnKey(key, down)
 	end
 end
 function Load(gameStart)
-	if GetGameMode() ~= "Editor" then
+	GameMode = GetGameMode()
+	if GameMode ~= "Editor" then
 		Log("Error: Map Editor Assistance: Editor mode expected. Please don't load this mod in other modes.")
 	else
 		Log("Map Editor Assistance: Thanks for your use. Hope this mod will help your map edit.")
@@ -250,8 +298,11 @@ function Load(gameStart)
 		else
 			AddStrings(path.."/db/strings_English.lua")
 		end
+		LoadControl(path.."/ui/screens/StructureSetting.lua", "root")
 		LoadControl(path.."/ui/screens/BlockSetting.lua", "root")
-		ShowControl("MapEditorAssistance", "MEA-BlockSetting", false)
+		ShowControl("root", "MEA-BlockSetting", false)
+		ShowControl("root", "MEA-StructureSetting", false)
 		BlockSettingEnabled = false
+		StructureSettingEnabled = false
 	end
 end

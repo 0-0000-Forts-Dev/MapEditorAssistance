@@ -12,11 +12,13 @@
 
 3. All the `Prerequisite` of materials are removed.
 
-4. When you select a node, you can press **Ctrl+M** to get some basic information about the structure where the node is located in the log.
+4. When you select a node, you can press **Ctrl+M** to collect some basic information about the structure where the node is located in the log.
 
 5. You can press **Ctrl+N** to clear all isolated nodes(without any links).
 
 6. Add a **Block Setting Interface** which enables you to change block values visually, instead of the complex shorcuts.
+
+7. Add a **Structure Setting Interface** which enables you to change its owner or collect information(Feature 5) visually.
 
 ### Structure Information
 
@@ -56,11 +58,20 @@ The output format: `Structure $: $m, $e, $e-, N $, F $, L $, lenO $, len $, lenB
 
 The interface shows when you select any blocks and hides when you have no block selection. It can modify the flags and owner of selected blocks. However, you might take these notes:
 
-1. The show/hide switch has an unstable **delay**, which might reach 2 seconds. Just be patient.
+1. The show/hide switch will **not be applied immediately** until you **make further key inputs**(include mouse inputs), for example you can press some keyboard keys that aren't any shorcuts to update this interface, like single **Shift**.
 
-2. Forts may add a new vertex for a block when you click the buttons in some cases. That will change the selected block' shape, but this mod will withdraw the new created vertex and restore the block.
+2. Forts may add a new vertex for a block when you click the buttons in some cases. That will change the selected block' shape, but this mod will withdraw the new created vertex and restore the block. And that will probably change the block's info-texts's world position.
 
 3. **Don't apply the buttons for new block**(the new block before losing focus). In that case this mod won't restore its shape. Undo if that happens. To easily use the interface for the block, you can **right click the block** to reselect the block.
+
+4. Supports owner changes from *Background* or to *Background* poorly. It won't make the block transparent and will dismiss its original surface. You are expected to make this change by hand(Tip: **5** sets to *Background*, **1,2,3,4** from *Background*)
+
+### Structure Setting Interface
+
+Just like Block Setting Interface, this interface shows and hides with your structure selection(identified by node or device, **link selection can't be identified**). Currently It can modify the owner of selected structure or collect its information without Ctrl+M. You might take these notes:
+
+1. The show/hide switch will **not be applied immediately** until **further key inputs**. The trick is as same as that of Block Setting Interface.
+2. The owner change feature **isn't available if dlc2 isn't active**.
 
 ## Precautions
 
@@ -84,21 +95,32 @@ It's okay to make your own revised versions of this mod and even **publish them 
 
 3. 所有材料的前置(`Prerequisite`)被移除
 
-4. 当你选中节点时，可以按 **Ctrl+M** 来在日志输出中获取该节点所在结构的基本信息
+4. 当你选中节点时，可以按 **Ctrl+M** 来在统计并在日志中输出该节点所在结构的基本信息
 
 5. 按 **Ctrl+N** 清除所有孤立节点(没有连接的节点)
 
 6. 新增一个**地形块设置界面**，让你可以可视化地修改地形块属性而不需要使用复杂的快捷键
 
+7. 新增一个**结构设置界面**，让你可以可视化修改其所属队伍或统计信息(功能 4)
+
 ### 地形块设置界面
 
 该界面会在你选中任何地形块时显示并在未选中地形块时隐藏，它可以修改地形块标志和所有者。不过你需要注意以下事项：
 
-1. 界面的显示/隐藏过程有不稳定的**延迟**，可多达 2 秒
+1. 界面的显示/隐藏**不会立即生效**，除非你**进一步进行键盘操作**(包括鼠标操作)，例如你可以按下某些非快捷键的按键来更新本界面，比如单个 **Shift** 键。
 
-2. Forts 在某些情况下会在你点击该界面按钮时为地形块新增节点，这会改变地形块的形状，不过本模组会删除新增的那个节点并复原地形块
+2. Forts 在某些情况下会在你点击该界面按钮时为地形块新增节点，这会改变地形块的形状，不过本模组会删除新增的那个节点并复原地形块，这同时很可能也会改变这个地形块属性文本的位置。
 
 3. **不要对新地形块直接使用本界面**(在失去焦点前的新地形块)，那样模组就不会复原地形块形状了，这是你应该撤销操作。要便捷的对这样的地形块使用本界面，你可以**右击这个地形块**重新选择这个块。
+
+4. 不是很好地支持从或到*背景*的所有者转换，这样不会让地形块变得透明且会使其失去表面，你应该自行做这样的修改(Tip: **5** 修改为*背景*，**1,2,3,4** 变为其它所有者)
+
+### 结构设置界面
+
+和地形块设置界面一样，本界面同样随着你的结构选择(通过节点或装置判断，**不能通过选择连接来判断**)而显示和隐藏。目前本界面可以修改选中结构的所属队伍或无需快捷键 Ctrl+M 地统计结构信息。注意以下事项：
+
+1. 界面的显示/隐藏**不会立即生效**，除非你**进一步进行键盘操作**，参见地形块设置界面的描述。
+2. 改变所属队伍的功能**在 dlc2 未启用时不可用**。
 
 ### 结构信息
 
