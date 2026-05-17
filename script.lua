@@ -306,3 +306,14 @@ function Load(gameStart)
 		StructureSettingEnabled = false
 	end
 end
+
+function OnDeviceSelected()
+	if GameMode ~= "Editor" then return end
+	UpdateBlockSelection()
+	UpdateStructureSelection()
+end
+function OnTabOpened()
+	if GameMode ~= "Editor" then return end
+	UpdateBlockSelection()
+	UpdateStructureSelection()
+end

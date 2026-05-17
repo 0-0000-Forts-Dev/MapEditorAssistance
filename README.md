@@ -18,7 +18,7 @@
 
 6. Add a **Block Setting Interface** which enables you to change block values visually, instead of the complex shorcuts.
 
-7. Add a **Structure Setting Interface** which enables you to change its owner or collect information(Feature 5) visually.
+7. Add a **Structure Setting Interface** which enables you to change its owner or collect information(Feature 4) visually.
 
 ### Structure Information
 
