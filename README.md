@@ -16,9 +16,9 @@
 
 5. You can press **Ctrl+N** to clear all isolated nodes(without any links).
 
-6. Add a **Block Setting Interface** which enables you to change block values visually, instead of the complex shorcuts.
+6. Add a **Block Setting Interface** which enables you to modify blocks visually, instead of the complex shorcuts.
 
-7. Add a **Structure Setting Interface** which enables you to change its owner or collect information(Feature 4) visually.
+7. Add a **Structure Setting Interface** which enables you to modify a structure visually.
 
 ### Structure Information
 
@@ -56,7 +56,7 @@ The output format: `Structure $: $m, $e, $e-, N $, F $, L $, lenO $, len $, lenB
 
 ### Block Setting Interface
 
-The interface shows when you select any blocks and hides when you have no block selection. It can modify the flags and owner of selected blocks. However, you might take these notes:
+The interface shows when you select any blocks and hides when you have no block selection. It can modify selected blocks in many ways. However, you might take these notes:
 
 1. The show/hide switch will **not be applied immediately** until you **make further key inputs**(include mouse inputs), for example you can press some keyboard keys that aren't any shorcuts to update this interface, like single **Shift**.
 
@@ -66,12 +66,15 @@ The interface shows when you select any blocks and hides when you have no block 
 
 4. Supports owner changes from *Background* or to *Background* poorly. It won't make the block transparent and will dismiss its original surface. You are expected to make this change by hand(Tip: **5** sets to *Background*, **1,2,3,4** from *Background*)
 
+5. TextButtons with `!` surrounding are related to **Destructive Features**. They require **double click** to apply.
+
 ### Structure Setting Interface
 
-Just like Block Setting Interface, this interface shows and hides with your structure selection(identified by node or device, **link selection can't be identified**). Currently It can modify the owner of selected structure or collect its information without Ctrl+M. You might take these notes:
+Just like Block Setting Interface, this interface shows and hides with your structure selection(identified by node or device, **link selection can't be identified**). You might take these notes:
 
 1. The show/hide switch will **not be applied immediately** until **further key inputs**. The trick is as same as that of Block Setting Interface.
 2. The owner change feature **isn't available if dlc2 isn't active**.
+3. **Destructive Features**(See also Block Setting Interface) require **double click** to apply.
 
 ## Precautions
 
@@ -99,9 +102,9 @@ It's okay to make your own revised versions of this mod and even **publish them 
 
 5. 按 **Ctrl+N** 清除所有孤立节点(没有连接的节点)
 
-6. 新增一个**地形块设置界面**，让你可以可视化地修改地形块属性而不需要使用复杂的快捷键
+6. 新增一个**地形块设置界面**，让你可以可视化地修改地形块而不需要使用复杂的快捷键
 
-7. 新增一个**结构设置界面**，让你可以可视化修改其所属队伍或统计信息(功能 4)
+7. 新增一个**结构设置界面**，让你可以可视化修改结构
 
 ### 地形块设置界面
 
@@ -113,7 +116,9 @@ It's okay to make your own revised versions of this mod and even **publish them 
 
 3. **不要对新地形块直接使用本界面**(在失去焦点前的新地形块)，那样模组就不会复原地形块形状了，这是你应该撤销操作。要便捷的对这样的地形块使用本界面，你可以**右击这个地形块**重新选择这个块。
 
-4. 不是很好地支持从或到*背景*的所有者转换，这样不会让地形块变得透明且会使其失去表面，你应该自行做这样的修改(Tip: **5** 修改为*背景*，**1,2,3,4** 变为其它所有者)
+4. 不是很好地支持从或到*背景*的所有者转换，这样不会让地形块变得透明且会使其失去表面，你应该自行做这样的修改(Tip: **5** 修改为*背景*，**1,2,3,4** 变为其它所有者)。
+
+5. 用 `!` 包围的文字按钮对应**破坏性操作**，它们需要**双击**才能生效。
 
 ### 结构设置界面
 
@@ -121,6 +126,7 @@ It's okay to make your own revised versions of this mod and even **publish them 
 
 1. 界面的显示/隐藏**不会立即生效**，除非你**进一步进行键盘操作**，参见地形块设置界面的描述。
 2. 改变所属队伍的功能**在 dlc2 未启用时不可用**。
+3. **破坏性操作**(参见地形块设置界面)需要**双击**才能生效。
 
 ### 结构信息
 

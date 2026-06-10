@@ -440,5 +440,25 @@ Root = {
 				Control = {Position = {0, 300}},
 			},
 		},
+
+		-- Basis
+		{
+			Type = "TextButton",
+			Name = "MEA-BS_FlipNormal",
+			Style = "Normal",
+			Text = {
+				Text = "$MEA.BS_FlipNormal",
+				Control = {Position = {0, 320}},
+			},
+		},
+		{
+			Type = "TextButton",
+			Name = "MEA-BS_Delete",
+			Style = "Normal",
+			Text = {
+				Text = "$MEA.BS_Delete",
+				Control = {Position = {0, 360}},
+			},
+		},
 	},
 }

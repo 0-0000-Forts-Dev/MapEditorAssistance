@@ -244,6 +244,32 @@ function OnControlActivated(name, code, doubleClick)
 			end
 			MakeUndoLevel()
 		end
+	elseif name == "MEA-BS_FlipNormal" then
+		local selects = #BlockSelection
+		if selects > 0 then
+			for i = 0, selects-1 do
+				local blockIndex = GetBlockSelection(i)
+				if selects == 1 and not BlockSelection.still then
+					DeleteBlockVertex(blockIndex, 1)
+					BlockSelection.still = true
+					UpdateGroundTriangles()
+				end
+				FlipBlockNormals(GetBlockSelection(i))
+			end
+			MakeUndoLevel()
+		end
+	elseif name == "MEA-BS_Delete" then
+		local selects = #BlockSelection
+		if selects > 0 and doubleClick then
+			local blocks = {}
+			for i = 0, selects-1 do
+				blocks[#blocks+1] = GetBlockSelection(i)
+			end
+			table.sort(blocks)
+			for i = #blocks, 1, -1 do
+				DeleteBlock(blocks[i])
+			end
+		end
 	-- MEA-SO-$Owner$
 	elseif string.sub(name, 1, 7)=="MEA-SO_" then
 		if StructureSelection then
@@ -251,8 +277,13 @@ function OnControlActivated(name, code, doubleClick)
 			dlc2_ConvertStructure(StructureSelection, StructureNodeAtIndex(StructureSelection, 0), GetStructureTeam(StructureSelection), StructureOwner[owner])
 			MakeUndoLevel()
 		end
-	elseif name == "MEA-SE_CollentInformation" then
+	elseif name == "MEA-SE_CollectInformation" then
 		if StructureSelection then LogStructureData(StructureSelection) end
+	elseif name == "MEA-SS_Delete" then
+		if StructureSelection and doubleClick then
+			DestroyStructure(StructureNodeAtIndex(StructureSelection, 0))
+			MakeUndoLevel()
+		end
 	end
 end
 

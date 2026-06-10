@@ -17,9 +17,9 @@ Root = {
 		{
 			Type = "TextButton",
 			Style = "Normal",
-			Name = "MEA-SE_CollentInformation",
+			Name = "MEA-SE_CollectInformation",
 			Text = {
-				Text = "$MEA.SE_CollentInformation",
+				Text = "$MEA.SE_CollectInformation",
 				Control = {Position = {0, 20}},
 			},
 		},
@@ -58,6 +58,17 @@ Root = {
 			Text = {
 				Text = "$SetOwnerBackground",
 				Control = {Position = {0, 100}},
+			},
+		},
+
+		-- Basis
+		{
+			Type = "TextButton",
+			Name = "MEA-SS_Delete",
+			Style = "Normal",
+			Text = {
+				Text = "$MEA.SS_Delete",
+				Control = {Position = {0, 140}},
 			},
 		},
 	},
