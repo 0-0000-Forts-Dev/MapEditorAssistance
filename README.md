@@ -73,8 +73,8 @@ The interface shows when you select any blocks and hides when you have no block 
 Just like Block Setting Interface, this interface shows and hides with your structure selection(identified by node or device, **link selection can't be identified**). You might take these notes:
 
 1. The show/hide switch will **not be applied immediately** until **further key inputs**. The trick is as same as that of Block Setting Interface.
-2. The owner change feature **isn't available if dlc2 isn't active**.
-3. **Destructive Features**(See also Block Setting Interface) require **double click** to apply.
+2. **Destructive Features**(See also Block Setting Interface) require **double click** to apply.
+3. The `Remove Structure` feature will bring about undo levels for each device of the structure.
 
 ## Precautions
 
@@ -125,8 +125,8 @@ It's okay to make your own revised versions of this mod and even **publish them 
 和地形块设置界面一样，本界面同样随着你的结构选择(通过节点或装置判断，**不能通过选择连接来判断**)而显示和隐藏。目前本界面可以修改选中结构的所属队伍或无需快捷键 Ctrl+M 地统计结构信息。注意以下事项：
 
 1. 界面的显示/隐藏**不会立即生效**，除非你**进一步进行键盘操作**，参见地形块设置界面的描述。
-2. 改变所属队伍的功能**在 dlc2 未启用时不可用**。
-3. **破坏性操作**(参见地形块设置界面)需要**双击**才能生效。
+2. **破坏性操作**(参见地形块设置界面)需要**双击**才能生效。
+3. `移除结构` 功能会给结构中的每个装置都留下撤回状态。
 
 ### 结构信息
 

@@ -274,13 +274,27 @@ function OnControlActivated(name, code, doubleClick)
 	elseif string.sub(name, 1, 7)=="MEA-SO_" then
 		if StructureSelection then
 			local owner = string.sub(name, 8)
-			dlc2_ConvertStructure(StructureSelection, StructureNodeAtIndex(StructureSelection, 0), GetStructureTeam(StructureSelection), StructureOwner[owner])
+			ConvertStructure(StructureSelection, StructureNodeAtIndex(StructureSelection, 0), GetStructureTeam(StructureSelection), StructureOwner[owner])
 			MakeUndoLevel()
 		end
 	elseif name == "MEA-SE_CollectInformation" then
 		if StructureSelection then LogStructureData(StructureSelection) end
 	elseif name == "MEA-SS_Delete" then
 		if StructureSelection and doubleClick then
+			local teamId = GetStructureTeam(StructureSelection)
+			local devs = {}
+			for i = 0, GetDeviceCount(teamId)-1 do
+				local id = GetDeviceId(teamId, i)
+				if GetDeviceStructureId(id) == StructureSelection then
+					devs[#devs+1] = id
+				end
+			end
+			for _, id in ipairs(devs) do
+				DestroyDeviceById(id)
+				if IsGroundDevice(id) then
+					DeleteDeviceById(id)
+				end
+			end
 			DestroyStructure(StructureNodeAtIndex(StructureSelection, 0))
 			MakeUndoLevel()
 		end
@@ -337,6 +351,21 @@ function Load(gameStart)
 		StructureSettingEnabled = false
 	end
 end
+
+--[[
+function OnContextMenuStrut(strutTeamId, nodeA, nodeB, saveName)
+	if IsLinkFlammable(nodeA, nodeB) then
+		-- Link Setting - Ignite Link
+		AddContextButton("", "MEA-LS-IL", 0, true, false)
+	end
+end
+function OnContextButtonStrut(script, name, teamId, nodeA, nodeB, saveName)
+	if name == "MWA-LS-IL" then
+		IgniteLink(nodeA, nodeB, false)
+		MakeUndoLevel()
+	end
+end
+--]]
 
 function OnDeviceSelected()
 	if GameMode ~= "Editor" then return end
