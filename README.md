@@ -2,7 +2,23 @@
 
 *Author: 0-0000*
 
+[English](#Usage)
+
+[简体中文](#使用)
+
 ---
+
+## Usage
+
+This project is for Forts Map Editor. You might load this as a mod in your map in editor mode.
+
+*move.bat* helps to one-click create a copy in Forts local mods folder(*data/mods/MapEditorAssistance*). So you can directly load this project as a Forts mod locally.
+
+For created maps, you can add the mod id(`"MapEditorAssistance"`) to the `Mods` table in your map's mission script(*playermap?.lua*) or *mods.lua*(usually not existed, but it works). Do take these precautions:
+
+- Don't load this mod in non-edit modes, as it changed some game datas.
+
+- Remove this mod from the map files before publish.
 
 ## Features
 
@@ -76,12 +92,6 @@ Just like Block Setting Interface, this interface shows and hides with your stru
 2. **Destructive Features**(See also Block Setting Interface) require **double click** to apply.
 3. The `Remove Structure` feature will bring about undo levels for each device of the structure.
 
-## Precautions
-
-- Don't load this mod in non-edit modes, as it changed some game datas.
-
-- Remove this mod from the map files before publish.(Remove this mod from `Mods`)
-
 ## License Notice
 
 **In Short:** You are free to use, modify, and distribute this code  under the **MIT License**. However, you **must keep my copyright notice** intact.
@@ -89,6 +99,18 @@ Just like Block Setting Interface, this interface shows and hides with your stru
 It's okay to make your own revised versions of this mod and even **publish them to Steam Forts Community**, as long as you comply with the license.
 
 ---
+
+## 使用
+
+本项目用于 Forts 地图编辑，你应该在编辑模式中在你的地图中将其加载为一个模组。
+
+*move.bat* 可一键在 Forts 本地模组文件夹下创建副本(*data/mods/MapEditorAssistance*)，让你可以直接将本项目作为 Forts 模组加载。
+
+对于已经创建的地图，你应该将模组 id(`"MapEditorAssistance"`)加到地图任务脚本(*playermap?.lua*)或 *mods.lua*(通常不存在，但确实有用) 中。注意以下事项：
+
+- 不要在非编辑模式下使用该模组，它会改变部分游戏数据
+
+- 在完成编辑发布地图前，请先将本模组从地图文件中移除
 
 ## 功能
 
@@ -159,12 +181,6 @@ It's okay to make your own revised versions of this mod and even **publish them 
 > `len0`，即连接原始长度不再显示，因为模组无法在这种情况下准确获取材料的原始长度
 > 
 > 结构连接的金属/能源花费会通过连接的原始长度估算。这可能导致**高估或者低估**，取决于你的结构是压缩的还是被拉伸的。
-
-## 注意事项
-
-- 不要在非编辑模式下使用该模组，它会改变部分游戏数据
-
-- 在完成编辑发布地图前，请先将本模组从地图文件中移除(在 `Mods` 中将该模组名移除)
 
 ## 许可声明
 
