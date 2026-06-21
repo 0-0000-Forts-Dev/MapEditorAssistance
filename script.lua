@@ -282,9 +282,15 @@ function OnControlActivated(name, code, doubleClick)
 	elseif name == "MEA-SS_Delete" then
 		if StructureSelection and doubleClick then
 			local teamId = GetStructureTeam(StructureSelection)
+			-- not existed or with the owner of none(can't be deleted directly)
+			if teamId == -1 then
+				ConvertStructure(StructureSelection, StructureNodeAtIndex(StructureSelection, 0), -1, 0)
+				teamId = 0
+			end
 			local devs = {}
 			for i = 0, GetDeviceCount(teamId)-1 do
 				local id = GetDeviceId(teamId, i)
+				-- note that for none or background ground devices, it will always be 0 
 				if GetDeviceStructureId(id) == StructureSelection then
 					devs[#devs+1] = id
 				end

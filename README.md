@@ -91,6 +91,7 @@ Just like Block Setting Interface, this interface shows and hides with your stru
 1. The show/hide switch will **not be applied immediately** until **further key inputs**. The trick is as same as that of Block Setting Interface.
 2. **Destructive Features**(See also Block Setting Interface) require **double click** to apply.
 3. The `Remove Structure` feature will bring about undo levels for each device of the structure.
+4. `Remove Structure` won't remove belonging ground devices for structures of `none` or `background`. You can convert the structure's owner team to side1 or side2 in advance to prevent it.
 
 ## License Notice
 
@@ -149,6 +150,7 @@ It's okay to make your own revised versions of this mod and even **publish them 
 1. 界面的显示/隐藏**不会立即生效**，除非你**进一步进行键盘操作**，参见地形块设置界面的描述。
 2. **破坏性操作**(参见地形块设置界面)需要**双击**才能生效。
 3. `移除结构` 功能会给结构中的每个装置都留下撤回状态。
+4. `移除结构` 功能不会移除由所有者为"无"或"背景"的结构所有的地面装置，你可以提前将其所有者改为团队 1 或团队 2 来避免这个问题。 
 
 ### 结构信息
 
