@@ -74,7 +74,7 @@ The output format: `Structure $: $m, $e, $e-, N $, F $, L $, lenO $, len $, lenB
 
 The interface shows when you select any blocks and hides when you have no block selection. It can modify selected blocks in many ways. However, you might take these notes:
 
-1. The show/hide switch will **not be applied immediately** until you **make further key inputs**(include mouse inputs), for example you can press some keyboard keys that aren't any shorcuts to update this interface, like single **Shift**.
+1. 
 
 2. Forts may add a new vertex for a block when you click the buttons in some cases. That will change the selected block' shape, but this mod will withdraw the new created vertex and restore the block. And that will probably change the block's info-texts's world position.
 
@@ -88,10 +88,9 @@ The interface shows when you select any blocks and hides when you have no block 
 
 Just like Block Setting Interface, this interface shows and hides with your structure selection(identified by node or device, **link selection can't be identified**). You might take these notes:
 
-1. The show/hide switch will **not be applied immediately** until **further key inputs**. The trick is as same as that of Block Setting Interface.
-2. **Destructive Features**(See also Block Setting Interface) require **double click** to apply.
-3. The `Remove Structure` feature will bring about undo levels for each device of the structure.
-4. `Remove Structure` won't remove belonging ground devices for structures of `none` or `background`. You can convert the structure's owner team to side1 or side2 in advance to prevent it.
+1. **Destructive Features**(See also Block Setting Interface) require **double click** to apply.
+2. The `Remove Structure` feature will bring about undo levels for each device of the structure.
+3. `Remove Structure` won't remove belonging ground devices for structures of `none` or `background`. You can convert the structure's owner team to side1 or side2 in advance to prevent it.
 
 ## License Notice
 
@@ -133,24 +132,21 @@ It's okay to make your own revised versions of this mod and even **publish them 
 
 该界面会在你选中任何地形块时显示并在未选中地形块时隐藏，它可以修改地形块标志和所有者。不过你需要注意以下事项：
 
-1. 界面的显示/隐藏**不会立即生效**，除非你**进一步进行键盘操作**(包括鼠标操作)，例如你可以按下某些非快捷键的按键来更新本界面，比如单个 **Shift** 键。
+1. Forts 在某些情况下会在你点击该界面按钮时为地形块新增节点，这会改变地形块的形状，不过本模组会删除新增的那个节点并复原地形块，这同时很可能也会改变这个地形块属性文本的位置。
 
-2. Forts 在某些情况下会在你点击该界面按钮时为地形块新增节点，这会改变地形块的形状，不过本模组会删除新增的那个节点并复原地形块，这同时很可能也会改变这个地形块属性文本的位置。
+2. **不要对新地形块直接使用本界面**(在失去焦点前的新地形块)，那样模组就不会复原地形块形状了，这是你应该撤销操作。要便捷的对这样的地形块使用本界面，你可以**右击这个地形块**重新选择这个块。
 
-3. **不要对新地形块直接使用本界面**(在失去焦点前的新地形块)，那样模组就不会复原地形块形状了，这是你应该撤销操作。要便捷的对这样的地形块使用本界面，你可以**右击这个地形块**重新选择这个块。
+3. 不是很好地支持从或到*背景*的所有者转换，这样不会让地形块变得透明且会使其失去表面，你应该自行做这样的修改(Tip: **5** 修改为*背景*，**1,2,3,4** 变为其它所有者)。
 
-4. 不是很好地支持从或到*背景*的所有者转换，这样不会让地形块变得透明且会使其失去表面，你应该自行做这样的修改(Tip: **5** 修改为*背景*，**1,2,3,4** 变为其它所有者)。
-
-5. 用 `!` 包围的文字按钮对应**破坏性操作**，它们需要**双击**才能生效。
+4. 用 `!` 包围的文字按钮对应**破坏性操作**，它们需要**双击**才能生效。
 
 ### 结构设置界面
 
 和地形块设置界面一样，本界面同样随着你的结构选择(通过节点或装置判断，**不能通过选择连接来判断**)而显示和隐藏。目前本界面可以修改选中结构的所属队伍或无需快捷键 Ctrl+M 地统计结构信息。注意以下事项：
 
-1. 界面的显示/隐藏**不会立即生效**，除非你**进一步进行键盘操作**，参见地形块设置界面的描述。
-2. **破坏性操作**(参见地形块设置界面)需要**双击**才能生效。
-3. `移除结构` 功能会给结构中的每个装置都留下撤回状态。
-4. `移除结构` 功能不会移除由所有者为"无"或"背景"的结构所有的地面装置，你可以提前将其所有者改为团队 1 或团队 2 来避免这个问题。 
+1. **破坏性操作**(参见地形块设置界面)需要**双击**才能生效。
+2. `移除结构` 功能会给结构中的每个装置都留下撤回状态。
+3. `移除结构` 功能不会移除由所有者为"无"或"背景"的结构所有的地面装置，你可以提前将其所有者改为团队 1 或团队 2 来避免这个问题。 
 
 ### 结构信息
 

@@ -209,56 +209,53 @@ function UpdateStructureSelection()
 	SetControlText("MEA-StructureSetting", "MEA-SI_StructureId", "id: "..structureId)
 end
 
+function RepairBlock()
+	if #BlockSelection == 1 and not BlockSelection.still then
+		DeleteBlockVertex(GetBlockSelection(0), 1)
+		BlockSelection.still = true
+		UpdateGroundTriangles()
+	end
+end
+
 function OnControlActivated(name, code, doubleClick)
 	if GameMode ~= "Editor" then return end
 	-- MEA-BF_$FLAG$-$T/F$
 	if string.sub(name, 1, 7)=="MEA-BF_" then
+		RepairBlock()
 		local selects = #BlockSelection
 		if selects > 0 then
 			local flag = string.sub(name, 8, -3)
 			local value = string.sub(name, -1)=="T"
 			for i = 0, selects-1 do
 				local blockIndex = GetBlockSelection(i)
-				if selects == 1 and not BlockSelection.still then
-					DeleteBlockVertex(blockIndex, 1)
-					BlockSelection.still = true
-					UpdateGroundTriangles()
-				end
 				SetBlockFlags(blockIndex, BlockFlags[flag], value)
 			end
 			MakeUndoLevel()
 		end
 	-- MEA-BO_$Owner$
 	elseif string.sub(name, 1, 7)=="MEA-BO_" then
+		RepairBlock()
 		local selects = #BlockSelection
 		if selects > 0 then
 			local owner = string.sub(name, 8)
 			for i = 0, selects-1 do
 				local blockIndex = GetBlockSelection(i)
-				if selects == 1 and not BlockSelection.still then
-					DeleteBlockVertex(blockIndex, 1)
-					BlockSelection.still = true
-					UpdateGroundTriangles()
-				end
 				SetBlockOwner(blockIndex, BlockOwner[owner])
 			end
 			MakeUndoLevel()
 		end
 	elseif name == "MEA-BS_FlipNormal" then
+		RepairBlock()
 		local selects = #BlockSelection
 		if selects > 0 then
 			for i = 0, selects-1 do
 				local blockIndex = GetBlockSelection(i)
-				if selects == 1 and not BlockSelection.still then
-					DeleteBlockVertex(blockIndex, 1)
-					BlockSelection.still = true
-					UpdateGroundTriangles()
-				end
 				FlipBlockNormals(GetBlockSelection(i))
 			end
 			MakeUndoLevel()
 		end
 	elseif name == "MEA-BS_Delete" then
+		RepairBlock()
 		local selects = #BlockSelection
 		if selects > 0 and doubleClick then
 			local blocks = {}
@@ -290,7 +287,7 @@ function OnControlActivated(name, code, doubleClick)
 			local devs = {}
 			for i = 0, GetDeviceCount(teamId)-1 do
 				local id = GetDeviceId(teamId, i)
-				-- note that for none or background ground devices, it will always be 0 
+				-- note that for none or background ground devices, it will always be 0
 				if GetDeviceStructureId(id) == StructureSelection then
 					devs[#devs+1] = id
 				end
@@ -310,8 +307,6 @@ end
 local ctrlState = false
 function OnKey(key, down)
 	if GameMode ~= "Editor" then return end
-	UpdateBlockSelection()
-	UpdateStructureSelection()
 	if down then
 		if key == "left control" then
 			ctrlState = true
@@ -358,27 +353,7 @@ function Load(gameStart)
 	end
 end
 
---[[
-function OnContextMenuStrut(strutTeamId, nodeA, nodeB, saveName)
-	if IsLinkFlammable(nodeA, nodeB) then
-		-- Link Setting - Ignite Link
-		AddContextButton("", "MEA-LS-IL", 0, true, false)
-	end
-end
-function OnContextButtonStrut(script, name, teamId, nodeA, nodeB, saveName)
-	if name == "MWA-LS-IL" then
-		IgniteLink(nodeA, nodeB, false)
-		MakeUndoLevel()
-	end
-end
---]]
-
-function OnDeviceSelected()
-	if GameMode ~= "Editor" then return end
-	UpdateBlockSelection()
-	UpdateStructureSelection()
-end
-function OnTabOpened()
+function OnDraw()
 	if GameMode ~= "Editor" then return end
 	UpdateBlockSelection()
 	UpdateStructureSelection()
