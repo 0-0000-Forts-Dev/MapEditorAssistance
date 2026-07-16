@@ -74,15 +74,13 @@ The output format: `Structure $: $m, $e, $e-, N $, F $, L $, lenO $, len $, lenB
 
 The interface shows when you select any blocks and hides when you have no block selection. It can modify selected blocks in many ways. However, you might take these notes:
 
-1. 
+1. Forts may add a new vertex for a block when you click the buttons in some cases. That will change the selected block' shape, but this mod will withdraw the new created vertex and restore the block. And that will probably change the block's info-texts's world position.
 
-2. Forts may add a new vertex for a block when you click the buttons in some cases. That will change the selected block' shape, but this mod will withdraw the new created vertex and restore the block. And that will probably change the block's info-texts's world position.
+2. **Don't apply the buttons for new block**(the new block before losing focus). In that case this mod won't restore its shape. Undo if that happens. To easily use the interface for the block, you can **right click the block** to reselect the block.
 
-3. **Don't apply the buttons for new block**(the new block before losing focus). In that case this mod won't restore its shape. Undo if that happens. To easily use the interface for the block, you can **right click the block** to reselect the block.
+3. Supports owner changes from *Background* or to *Background* poorly. It won't make the block transparent and will dismiss its original surface. You are expected to make this change by hand(Tip: **5** sets to *Background*, **1,2,3,4** from *Background*)
 
-4. Supports owner changes from *Background* or to *Background* poorly. It won't make the block transparent and will dismiss its original surface. You are expected to make this change by hand(Tip: **5** sets to *Background*, **1,2,3,4** from *Background*)
-
-5. TextButtons with `!` surrounding are related to **Destructive Features**. They require **double click** to apply.
+4. TextButtons with `!` surrounding are related to **Destructive Features**. They require **double click** to apply.
 
 ### Structure Setting Interface
 

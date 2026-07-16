@@ -453,11 +453,29 @@ Root = {
 		},
 		{
 			Type = "TextButton",
+			Name = "MEA-BS_MirrorHorizontal",
+			Style = "Normal",
+			Text = {
+				Text = "$MEA.BS_MirrorHorizontal",
+				Control = {Position = {0, 340}},
+			},
+		},
+		{
+			Type = "TextButton",
+			Name = "MEA-BS_MirrorVertical",
+			Style = "Normal",
+			Text = {
+				Text = "$MEA.BS_MirrorVertical",
+				Control = {Position = {0, 360}},
+			},
+		},
+		{
+			Type = "TextButton",
 			Name = "MEA-BS_Delete",
 			Style = "Normal",
 			Text = {
 				Text = "$MEA.BS_Delete",
-				Control = {Position = {0, 360}},
+				Control = {Position = {0, 400}},
 			},
 		},
 	},

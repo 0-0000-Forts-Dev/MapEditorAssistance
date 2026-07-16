@@ -1,6 +1,7 @@
 -- Copyright (c) [0-0000]. Licensed under MIT.
 -- Please do not remove this notice.
 -- 请勿删除上述版权声明
+local min, max = math.min, math.max
 dofile("scripts/forts.lua")
 
 local IgnoredDevices = {
@@ -216,6 +217,18 @@ function RepairBlock()
 		UpdateGroundTriangles()
 	end
 end
+-- Bounding Box Center
+function GetBlockBBC(blockIndex)
+	local cnt = GetBlockVertexCount(blockIndex)
+	if cnt==0 then return Vec3(0,0,0) end
+	local xmin,xmax,ymin,ymax = 1e39,-1e39,1e39,-1e39
+	for i=0, cnt-1 do
+		local pos = GetBlockVertexPos(blockIndex, i)
+		xmin = min(xmin, pos.x); xmax = max(xmax, pos.x)
+		ymin = min(ymin, pos.y); ymax = max(ymax, pos.y)
+	end
+	return Vec3((xmin+xmax)*0.5, (ymin+ymax)*0.5, 0)
+end
 
 function OnControlActivated(name, code, doubleClick)
 	if GameMode ~= "Editor" then return end
@@ -251,6 +264,26 @@ function OnControlActivated(name, code, doubleClick)
 			for i = 0, selects-1 do
 				local blockIndex = GetBlockSelection(i)
 				FlipBlockNormals(GetBlockSelection(i))
+			end
+			MakeUndoLevel()
+		end
+	elseif name == "MEA-BS_MirrorHorizontal" then
+		RepairBlock()
+		local selects = #BlockSelection
+		if selects > 0 then
+			for i = 0, selects-1 do
+				local blockIndex = GetBlockSelection(i)
+				MirrorHorizontal(blockIndex, GetBlockBBC(blockIndex))
+			end
+			MakeUndoLevel()
+		end
+	elseif name == "MEA-BS_MirrorVertical" then
+		RepairBlock()
+		local selects = #BlockSelection
+		if selects > 0 then
+			for i = 0, selects-1 do
+				local blockIndex = GetBlockSelection(i)
+				MirrorVertical(blockIndex, GetBlockBBC(blockIndex))
 			end
 			MakeUndoLevel()
 		end
@@ -353,6 +386,7 @@ function Load(gameStart)
 	end
 end
 
+-- The only workable event. Update and OnUpdate won't work in Editor
 function OnDraw()
 	if GameMode ~= "Editor" then return end
 	UpdateBlockSelection()
