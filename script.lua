@@ -166,9 +166,24 @@ BlockSelection = {
 	still = false,
 }
 BlockSettingEnabled = false
+BlockNewlyCreated = false
 
+-- previous Block Count
+local preBC = -1
 function UpdateBlockSelection()
 	local selects = GetBlockSelectionCount()
+
+	-- Detect newly created block
+	local blockcnt = GetBlockCount()
+	if BlockNewlyCreated then
+		if selects ~= 1 or GetBlockSelection(0) ~= BlockSelection[1] then
+			BlockNewlyCreated = false
+		end
+	elseif blockcnt == preBC+1 and selects == 1 and GetBlockSelection(0)==preBC then
+		BlockNewlyCreated = true
+	end
+	preBC = blockcnt
+
 	-- Keep it true exactly when the selection has no changes
 	if not(BlockSelection.still and selects == 1 and GetBlockSelection(0) == BlockSelection[1]) then
 		BlockSelection.still = false
@@ -186,16 +201,21 @@ function UpdateBlockSelection()
 end
 StructureSelection = nil
 StructureSettingEnabled = false
+-- Previous Structure Selection Effect
+local preSSE1, preSSE2 = nil, nil
 function UpdateStructureSelection()
-	local id = GetLocalSelectedNodeId()
+	-- Sometimes mistakenly believes that you selects last-selected node when select no nodes
+	local objid = GetLocalSelectedNodeId()
 	local structureId = nil
-	if id > 0 then
-		structureId = NodeStructureId(id)
+	if objid > 0 then
+		structureId = NodeStructureId(objid)
 	else
-		id = GetLocalSelectedDeviceId()
-		if id ~= -1 then
-			id = GetDeviceStructureId(id)
-			if id ~= 0 then structureId = id end
+		objid = GetLocalSelectedDeviceId()
+		if objid ~= -1 then
+			local tmpStructureId = GetDeviceStructureId(id)
+			if tmpStructureId ~= 0 then
+				structureId = tmpStructureId
+			end
 		end
 	end
 	if not StructureSettingEnabled and structureId then
@@ -205,14 +225,33 @@ function UpdateStructureSelection()
 		ShowControl("root", "MEA-StructureSetting", false)
 		StructureSettingEnabled = false
 	end
+	if StructureSelection ~= structureId then
+		if preSSE1 then
+			CancelEffect(preSSE1)
+			CancelEffect(preSSE2)
+			preSSE1, preSSE2 = nil, nil
+		end
+		if structureId then
+			local pos = GetStructurePos(structureId)
+			pos.z = -101 -- draw over terrains: z<=-100
+			local radius = GetStructureRadius(structureId)
+			preSSE1 = SpawnCircle(pos, radius, Colour(255,64,64,100), 1)
+			preSSE2 = SpawnCircle(pos, radius/2, Colour(255,64,63,255), 1)
+		end
+	end
 	StructureSelection = structureId
-	if not structureId then structureId = -1 end
-	SetControlText("MEA-StructureSetting", "MEA-SI_StructureId", "id: "..structureId)
+	SetControlText("MEA-StructureSetting", "MEA-SI_StructureId", "id: "..(structureId and structureId or -1))
 end
 
 function RepairBlock()
+	-- If the user create new vertex in advance. This operation won't work appropriately.
 	if #BlockSelection == 1 and not BlockSelection.still then
-		DeleteBlockVertex(GetBlockSelection(0), 1)
+		-- This delete operation will block further vertex creation by mouse clicking.
+		if BlockNewlyCreated then
+			DeleteBlockVertex(GetBlockSelection(0), GetBlockVertexCount(GetBlockSelection(0))-1)
+		else
+			DeleteBlockVertex(GetBlockSelection(0), 1)
+		end
 		BlockSelection.still = true
 		UpdateGroundTriangles()
 	end

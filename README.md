@@ -74,21 +74,24 @@ The output format: `Structure $: $m, $e, $e-, N $, F $, L $, lenO $, len $, lenB
 
 The interface shows when you select any blocks and hides when you have no block selection. It can modify selected blocks in many ways. However, you might take these notes:
 
-1. Forts may add a new vertex for a block when you click the buttons in some cases. That will change the selected block' shape, but this mod will withdraw the new created vertex and restore the block. And that will probably change the block's info-texts's world position.
+1. Forts may add a new vertex for a block when you click the buttons in some cases. That will change the selected block' shape, but this mod will delete the new created vertex to restore the block. And that will probably **change the block's info-texts's world position**.
 
-2. **Don't apply the buttons for new block**(the new block before losing focus). In that case this mod won't restore its shape. Undo if that happens. To easily use the interface for the block, you can **right click the block** to reselect the block.
+2. **Don't mix this interface's operation and block vertex creation operation**: Clicking this interface's buttons after creating vertexs for selected block will let the mod **restore its shape wrongly**. After clicking this interface's buttons, **block vertex creation feature by mouse clicking will be suppressed**. So please **reselect block** if you want to switch the two functions.
 
-3. Supports owner changes from *Background* or to *Background* poorly. It won't make the block transparent and will dismiss its original surface. You are expected to make this change by hand(Tip: **5** sets to *Background*, **1,2,3,4** from *Background*)
+3. If you click a button in this interface but move out the mouse and release it outside the button: This will not be considered as a valid operation on this interface, and this mod **won't try to restore the block**.
 
-4. TextButtons with `!` surrounding are related to **Destructive Features**. They require **double click** to apply.
+4. Supports owner changes from *Background* or to *Background* poorly. It won't make the block transparent and will dismiss its original surface. You are expected to make this change by hand(Tip: **5** sets to *Background*, **1,2,3,4** from *Background*)
+
+5. TextButtons with `!` surrounding are related to **Destructive Features**. They require **double click** to apply.
 
 ### Structure Setting Interface
 
-Just like Block Setting Interface, this interface shows and hides with your structure selection(identified by node or device, **link selection can't be identified**). You might take these notes:
+Just like Block Setting Interface, this interface shows and hides with your structure selection(identified by node or device, **link selection can't be identified**). And this mod will additionally display a double-layered red circle to identify the position and size of the selected structure. You might take these notes:
 
 1. **Destructive Features**(See also Block Setting Interface) require **double click** to apply.
 2. The `Remove Structure` feature will bring about undo levels for each device of the structure.
 3. `Remove Structure` won't remove belonging ground devices for structures of `none` or `background`. You can convert the structure's owner team to side1 or side2 in advance to prevent it.
+4. Due to a bug in the API, sometimes the dynamic script **mistakenly believes that you have selected the last selected node** when you have not actually selected any node. In this case, this interface will also display, but you can easily identify this situation by the double-layered red circle.
 
 ## License Notice
 
@@ -130,21 +133,24 @@ It's okay to make your own revised versions of this mod and even **publish them 
 
 该界面会在你选中任何地形块时显示并在未选中地形块时隐藏，它可以修改地形块标志和所有者。不过你需要注意以下事项：
 
-1. Forts 在某些情况下会在你点击该界面按钮时为地形块新增节点，这会改变地形块的形状，不过本模组会删除新增的那个节点并复原地形块，这同时很可能也会改变这个地形块属性文本的位置。
+1. Forts 在某些情况下会在你点击该界面按钮时为地形块新增节点，这会改变地形块的形状，不过本模组会删除新增的那个节点以复原地形块，这同时很可能也会**改变这个地形块的属性文本的位置**。
 
-2. **不要对新地形块直接使用本界面**(在失去焦点前的新地形块)，那样模组就不会复原地形块形状了，这是你应该撤销操作。要便捷的对这样的地形块使用本界面，你可以**右击这个地形块**重新选择这个块。
+2. **不要混合使用本界面操作与新建地形块节点功能**：在对选中地形块新建节点后再点击本界面按钮，则模组会**错误地尝试复原地形块形状**，在点击本界面按钮后**点击新建节点的功能则会被抑制**。因此这两种用法相互切换时请**重新选择地形块**。
 
-3. 不是很好地支持从或到*背景*的所有者转换，这样不会让地形块变得透明且会使其失去表面，你应该自行做这样的修改(Tip: **5** 修改为*背景*，**1,2,3,4** 变为其它所有者)。
+3. 如果你点击本界面按钮但是移出鼠标在按钮外处释放，则这不会视为在本界面的有效操作，且**不会试图复原地形块**。
 
-4. 用 `!` 包围的文字按钮对应**破坏性操作**，它们需要**双击**才能生效。
+4. 不是很好地支持从或到*背景*的所有者转换，这样不会让地形块变得透明且会使其失去表面，你应该自行做这样的修改(Tip: **5** 修改为*背景*，**1,2,3,4** 变为其它所有者)。
+
+5. 用 `!` 包围的文字按钮对应**破坏性操作**，它们需要**双击**才能生效。
 
 ### 结构设置界面
 
-和地形块设置界面一样，本界面同样随着你的结构选择(通过节点或装置判断，**不能通过选择连接来判断**)而显示和隐藏。目前本界面可以修改选中结构的所属队伍或无需快捷键 Ctrl+M 地统计结构信息。注意以下事项：
+和地形块设置界面一样，本界面同样随着你的结构选择(通过节点或装置判断，**不能通过选择连接来判断**)而显示和隐藏，并且本模组会额外显示双层红色圆圈标识所选结构位置大小。注意以下事项：
 
 1. **破坏性操作**(参见地形块设置界面)需要**双击**才能生效。
 2. `移除结构` 功能会给结构中的每个装置都留下撤回状态。
-3. `移除结构` 功能不会移除由所有者为"无"或"背景"的结构所有的地面装置，你可以提前将其所有者改为团队 1 或团队 2 来避免这个问题。 
+3. `移除结构` 功能不会移除由所有者为"无"或"背景"的结构所有的地面装置，你可以提前将其所有者改为团队 1 或团队 2 来避免这个问题。
+4. 由于 API 的 bug，有时在你未选择节点时动态脚本会**误认为你选择了上次选择的节点**，这时本界面也会显示，可通过双层红圈标识来简单地识别这种情况。 
 
 ### 结构信息
 
