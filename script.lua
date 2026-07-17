@@ -269,6 +269,8 @@ function GetBlockBBC(blockIndex)
 	return Vec3((xmin+xmax)*0.5, (ymin+ymax)*0.5, 0)
 end
 
+-- Block Owner Background Warning
+local BOBW = false
 function OnControlActivated(name, code, doubleClick)
 	if GameMode ~= "Editor" then return end
 	-- MEA-BF_$FLAG$-$T/F$
@@ -292,6 +294,11 @@ function OnControlActivated(name, code, doubleClick)
 			local owner = string.sub(name, 8)
 			for i = 0, selects-1 do
 				local blockIndex = GetBlockSelection(i)
+				local powner = GetBlockOwner(blockIndex)
+				if not BOBW and powner == BlockOwner["Background"] or owner == "Background" then
+					Notice([[MEA: You change block's owner to or from "background": could be a [HL=ff7f7fff]wrong operation inconsistent with that by Editor shorcuts[/HL](1-5).]])
+					BOBW = true
+				end
 				SetBlockOwner(blockIndex, BlockOwner[owner])
 			end
 			MakeUndoLevel()
