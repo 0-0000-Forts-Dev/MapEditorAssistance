@@ -104,7 +104,8 @@ end)
 
 -- MEA-BF_$FLAG$-$T/F$
 RegisterControlHandler("MEA-BF_", function(name)
-	RepairBlock()
+	-- shift state: mouse click won't create new block vertex
+	if not ShiftState then RepairBlock() end
 	local selects = #BlockSelection
 	if selects > 0 then
 		local flag = string.sub(name, 8, -3)
@@ -121,7 +122,7 @@ end, true)
 local BOBW = false
 -- MEA-BO_$Owner$
 RegisterControlHandler("MEA-BO_", function(name)
-	RepairBlock()
+	if not ShiftState then RepairBlock() end
 	local selects = #BlockSelection
 	if selects > 0 then
 		local owner = string.sub(name, 8)
@@ -139,7 +140,7 @@ RegisterControlHandler("MEA-BO_", function(name)
 end, true)
 
 RegisterControlHandler("MEA-BS_FlipNormal", function()
-	RepairBlock()
+	if not ShiftState then RepairBlock() end
 	local selects = #BlockSelection
 	if selects > 0 then
 		for i = 0, selects-1 do
@@ -151,7 +152,7 @@ RegisterControlHandler("MEA-BS_FlipNormal", function()
 end)
 
 RegisterControlHandler("MEA-BS_MirrorHorizontal", function()
-	RepairBlock()
+	if not ShiftState then RepairBlock() end
 	local selects = #BlockSelection
 	if selects > 0 then
 		for i = 0, selects-1 do
@@ -163,7 +164,7 @@ RegisterControlHandler("MEA-BS_MirrorHorizontal", function()
 end)
 
 RegisterControlHandler("MEA-BS_MirrorVertical", function()
-	RepairBlock()
+	if not ShiftState then RepairBlock() end
 	local selects = #BlockSelection
 	if selects > 0 then
 		for i = 0, selects-1 do
@@ -175,7 +176,7 @@ RegisterControlHandler("MEA-BS_MirrorVertical", function()
 end)
 
 RegisterControlHandler("MEA-BS_Delete", function(name, doubleClick)
-	RepairBlock()
+	if not ShiftState then RepairBlock() end
 	local selects = #BlockSelection
 	if selects > 0 and doubleClick then
 		local blocks = {}
