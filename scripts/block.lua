@@ -182,7 +182,7 @@ RegisterEvent("OnKey", function(key, down)
 	-- determine the rotate centre
 	if not RotateCentre then
 		-- by mouse's position, but trigger by (Shift+)Enter
-		if key=="enter" and down then
+		if key=="enter" and down and not CtrlState then
 			-- Shift will cancel snap
 			-- Note that if your mouse clicking position is snap to a vertex of the target block:
 			-- The vertex will be selected and be moved to mouse position for further mouse click
