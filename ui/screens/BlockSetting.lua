@@ -471,11 +471,20 @@ Root = {
 		},
 		{
 			Type = "TextButton",
+			Name = "MEA-BS_Rotate",
+			Style = "Normal",
+			Text = {
+				Text = "$MEA.BS_Rotate",
+				Control = {Position = {0, 380}},
+			},
+		},
+		{
+			Type = "TextButton",
 			Name = "MEA-BS_Delete",
 			Style = "Normal",
 			Text = {
 				Text = "$MEA.BS_Delete",
-				Control = {Position = {0, 400}},
+				Control = {Position = {0, 420}},
 			},
 		},
 	},
