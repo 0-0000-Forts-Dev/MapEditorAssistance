@@ -78,11 +78,55 @@ The interface shows when you select any blocks and hides when you have no block 
 
 2. **Don't mix this interface's operation and block vertex creation operation**: Clicking this interface's buttons after creating vertexs for selected block will let the mod **restore its shape wrongly**. After clicking this interface's buttons, **block vertex creation feature by mouse clicking will be suppressed**. So please **reselect block** if you want to switch the two functions.
 
-3. If you click a button in this interface but move out the mouse and release it outside the button: This will not be considered as a valid operation on this interface, and this mod **won't try to restore the block**.
+3. When using this interface(include 'Block Rotation' below), **do not select any vertex of the selected blocks**, as this may cause the mod to misjudge the changes in terrain blocks, resulting in **terrain block mutations**.
 
-4. Supports owner changes from *Background* or to *Background* poorly. It won't make the block transparent and will dismiss its original surface. You are expected to make this change by hand(Tip: **5** sets to *Background*, **1,2,3,4** from *Background*)
+4. If you click a button on this interface but move out the mouse and release it outside the button: This will not be considered as a valid operation on this interface, and this mod **won't try to restore the block**.
 
-5. TextButtons with `!` surrounding are related to **Destructive Features**. They require **double click** to apply.
+5. Supports owner changes from *Background* or to *Background* poorly. It won't make the block transparent and will dismiss its original surface. You are expected to make this change by hand(Tip: **5** sets to *Background*, **1,2,3,4** from *Background*)
+
+6. TextButtons with `!` surrounding are related to **Destructive Features**. They require **double click** to apply.
+
+#### Block Rotation
+
+This is the most complex operation in block operation, and it is an innovative feature independent of the Forts map editor.
+
+To rotate a block, the following steps can be followed:
+
+1. Click the "Rotate Block" button on this interface to enter the **rotation mode**. The selected block will be the object that needs to be rotated.
+   
+   > To enter the rotation mode, you must select **exactly one block**, meaning you cannot attempt to rotate multiple blocks simultaneously.
+
+2. Confirm the rotation centre.
+   
+   > **Enter**: Use the position pointed by the mouse as the rotation centre.
+   > 
+   > **Alt+Enter**: Take the bounding box centre of the rotating object as the rotation centre.
+   > 
+   > **Left Click**: **Exit rotation mode**. Since this can easily lead to terrain block mutations, choose **Enter** to confirm.
+   > 
+   > A <u>red circle</u> will mark the position of the rotation centre or its preview.
+
+3. Confirm the rotation base line.
+   
+   > **Left Click**: Take the ray from the rotation centre to the position pointed by the mouse as the base line.
+   > 
+   > **Enter**: Take the positive direction of the x-axis as the base line.
+   > 
+   > A <u>white ray</u> will mark or preview the base line.
+
+4. Confirm the rotation final line.
+   
+   > **Left Click**: Take the ray from the rotation centre to the position pointed by the mouse as the final line. And **Apply Rotation**(from the base line to the final line).
+   > 
+   > **Ctrl**: Pressing it will display a preview of the rotated terrain block's position, and releasing it will restore.
+   > 
+   > **Enter**: Exit rotation mode.
+   > 
+   > A <u>black ray</u> will mark or preview the final line.
+
+Note that in the above steps, **Right Click** will always **exit the rotation mode**, and pressing the **Shift** key will cancel the snap of the mouse position reader(if the **Shift** key is not pressed, the mouse position will be snapped by default).
+
+**Do not perform any other operations in rotation mode**! This may lead to unpredictable results.
 
 ### Structure Setting Interface
 
@@ -137,11 +181,55 @@ It's okay to make your own revised versions of this mod and even **publish them 
 
 2. **不要混合使用本界面操作与新建地形块节点功能**：在对选中地形块新建节点后再点击本界面按钮，则模组会**错误地尝试复原地形块形状**，在点击本界面按钮后**点击新建节点的功能则会被抑制**。因此这两种用法相互切换时请**重新选择地形块**。
 
-3. 如果你点击本界面按钮但是移出鼠标在按钮外处释放，则这不会视为在本界面的有效操作，且**不会试图复原地形块**。
+3. 使用本界面(包括下面的'地形块旋转')时**请勿选中已选地形块的任何节点**，这会导致模组错误预判地形块变化使得**地形块异变**。
 
-4. 不是很好地支持从或到*背景*的所有者转换，这样不会让地形块变得透明且会使其失去表面，你应该自行做这样的修改(Tip: **5** 修改为*背景*，**1,2,3,4** 变为其它所有者)。
+4. 如果你点击本界面按钮但是移出鼠标在按钮外处释放，则这不会视为在本界面的有效操作，且**不会试图复原地形块**。
 
-5. 用 `!` 包围的文字按钮对应**破坏性操作**，它们需要**双击**才能生效。
+5. 不是很好地支持从或到*背景*的所有者转换，这样不会让地形块变得透明且会使其失去表面，你应该自行做这样的修改(Tip: **5** 修改为*背景*，**1,2,3,4** 变为其它所有者)。
+
+6. 用 `!` 包围的文字按钮对应**破坏性操作**，它们需要**双击**才能生效。
+
+#### 地形块旋转
+
+这是地形块操作中最复杂的操作，它是独立于 Forts 地图编辑器的一个创新功能。
+
+要旋转一个地形块，可分为以下步骤：
+
+1. 点击本界面的"旋转地形块"按钮，进入**旋转模式**，选中的地形块会作为需要旋转的对象。
+   
+   > 要进入旋转模式，你必须**恰好选择一个地形块**，也就是你不能试图同时旋转多个地形块。
+
+2. 确认旋转中心。
+   
+   > **Enter**: 以鼠标指向位置作为旋转中心。
+   > 
+   > **Alt+Enter**: 以旋转对象的边界框中心作为旋转中心。
+   > 
+   > **左键**: **退出旋转模式**，因为这很容易导致地形块异变，所以选择 **Enter** 来确定
+   > 
+   > 一个<u>红色圆圈</u>会标识旋转中心的位置或其预览。
+
+3. 确认旋转基准线。
+   
+   > **左键**: 以从旋转中心到鼠标指向位置的射线为基准线。
+   > 
+   > **Enter**: 以 x 轴正方向为基准线。
+   > 
+   > 一条<u>白色射线</u>会标识或预览基准线。
+
+4. 确认旋转终线。
+   
+   > **左键**: 以从旋转中心到鼠标指向位置的射线为终线，并**应用旋转**(从基准线旋转到终线)。
+   > 
+   > **Ctrl**: 按下期间会显示旋转后地形块位置的预览，松开后恢复。
+   > 
+   > **Enter**: 退出旋转模式。
+   > 
+   > 一条<u>黑色射线</u>会标识或预览终线。
+
+注意，在以上步骤中，**右键**始终会**退出旋转模式**，**Shift** 键在按下期间会取消取鼠标位置操作的自动吸附(如果 **Shift** 没有被按下则默认吸附鼠标位置)。
+
+**不要在旋转模式中做其它操作**！这有可能导致不可预料的结果。
 
 ### 结构设置界面
 

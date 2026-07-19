@@ -165,6 +165,10 @@ local function EnterRotation()
 	end
 end
 local function ExitRotation()
+	-- cancel block rotation preview
+	if RB_CurrRad then
+		RotateBlock(RB_Block, RB_Initial, RB_Centre, RB_CurrRad - RB_BaseRad)
+	end
 	RB_Block = nil
 	RB_Centre = nil
 	if RB_CEffect1 then CancelEffect(RB_CEffect1) end
@@ -378,9 +382,15 @@ RegisterControlHandler("MEA-BS_Delete", function(name, doubleClick)
 	end
 end)
 
+-- Block Rotation Tip
+local BSRT = false
 RegisterControlHandler("MEA-BS_Rotate", function(name, doubleClick)
 	if not ShiftState then RepairBlock() end
 	-- Only one block
+	if not BSRT then
+		Notice([[MEA: You are trying to rotate a block. Please refer to the [HL=7fff7fff]README[/HL] file of this mod for its usage.]])
+		BSRT = true
+	end
 	if #BlockSelection == 1 then
 		EnterRotation()
 	end
