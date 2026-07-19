@@ -6,6 +6,24 @@
 
 local min, max, pi, sin, cos, arcsin, arccos =
 math.min, math.max, math.pi, math.sin, math.cos, math.asin, math.acos
+
+local OverTerrainZ = -101 -- draw over terrains: z<=-100
+
+-- Get the bounding box centre of a block
+local function GetBlockBBC(blockIndex)
+	local cnt = GetBlockVertexCount(blockIndex)
+	if cnt==0 then return Vec3(0,0,0) end
+	local xmin,xmax,ymin,ymax = 1e39,-1e39,1e39,-1e39
+	for i=0, cnt-1 do
+		local pos = GetBlockVertexPos(blockIndex, i)
+		xmin = min(xmin, pos.x); xmax = max(xmax, pos.x)
+		ymin = min(ymin, pos.y); ymax = max(ymax, pos.y)
+	end
+	return Vec3((xmin+xmax)*0.5, (ymin+ymax)*0.5, 0)
+end
+
+-- Get the math rad of a vector from positon `base` to mouse's world position
+-- midist: if the distance between the two position is smaller than it, return defaultRad
 local function GetMouseRadFrom(base, mindist, defaultRad)
 	local target
 	if ShiftState then target = ScreenToWorld(GetMousePos())
@@ -14,6 +32,34 @@ local function GetMouseRadFrom(base, mindist, defaultRad)
 	if Vec3Length(diff)<mindist then return defaultRad
 	else return math.atan2(diff.y, diff.x) end
 end
+
+-- Rotate a block based on the `initial` table
+-- initial[i] should be the initial Vec3 position of the i-th vertex of the block
+-- Empty block isn't allowed
+local function RotateBlock(blockIndex, initial, centre, rad)
+	for i=0, #initial do
+		local diff = initial[i]-centre
+		local curr = centre + Vec3(diff.x*cos(rad)-diff.y*sin(rad),diff.x*sin(rad)+diff.y*cos(rad),0)
+		SetBlockVertexPos(blockIndex, i, curr)
+	end
+	UpdateGroundTriangles()
+	-- automaticly made at the right time because of mouse clicking
+	-- MakeUndoLevel()
+end
+--[[
+local function RotateBlock(blockIndex, centre, rad)
+	local cnt = GetBlockVertexCount(blockIndex)
+	for i=0, cnt-1 do
+		local diff = GetBlockVertexPos(blockIndex, i)-centre
+		local curr = centre + Vec3(diff.x*cos(rad)-diff.y*sin(rad),diff.x*sin(rad)+diff.y*cos(rad),0)
+		SetBlockVertexPos(blockIndex, i, curr)
+	end
+	UpdateGroundTriangles()
+	-- automaticly made because of mouse clicking
+	-- MakeUndoLevel()
+end
+--]]
+
 
 local BlockFlags = {
 	Foundations = 1<<0,
@@ -38,6 +84,23 @@ local BlockOwner = {
 	Team2 = 2,
 }
 
+-- Rotate Constants&Variables
+local RB_MinDistance = 5
+local RB_LineLength = 500000
+-- The target block's id which you are trying to rotate it
+local RB_Block = nil
+-- The block's vertexs' initial postion table
+local RB_Initial = {}
+local RB_Centre = nil
+-- Rotation centre effect
+local RB_CEffect1, RB_CEffect2 = nil, nil
+-- Rotation line effect(1: base, 2: preview)
+local RB_LEffect1, RB_LEffect2 = nil, nil
+-- Rotation base line's math rad and currect rad after actual rotation
+local RB_BaseRad, RB_CurrRad = nil, nil
+
+
+-- Block Selection & Block Repair
 local BlockSelection = {
 	-- [i] = blockIndex,
 	-- When only one block is selected: Whether the block has made an 'undo' and won't create new vertexs for further clicks
@@ -46,17 +109,6 @@ local BlockSelection = {
 }
 local BlockSettingEnabled = false
 local BlockNewlyCreated = false
-
-local RotateMinDistance = 5
-local RotateLineLength = 500000
--- The target block's id which you are trying to rotate it
-local RotateTarget = nil
-local RotateCentre = nil
--- Rotate Centre Effect
-local RCEffectId1, RCEffectId2 = nil, nil
--- Rotate Line Effect(1: base, 2: new preview)
-local RLEffectId1, RLEffectId2 = nil, nil
-local RotateBaseRad, RotateOriginRad = nil, nil
 -- previous Block Count
 local preBC = -1
 local function UpdateBlockSelection()
@@ -81,7 +133,7 @@ local function UpdateBlockSelection()
 	for i = 1, selects do BlockSelection[i] = GetBlockSelection(i-1) end
 	-- Note the display state won't be applied until further key inputs
 	if not BlockSettingEnabled and selects > 0 then
-		if not RotateTarget then
+		if not RB_Block then
 			ShowControl("root", "MEA-BlockSetting", true)
 		end
 		BlockSettingEnabled = true
@@ -90,7 +142,6 @@ local function UpdateBlockSelection()
 		BlockSettingEnabled = false
 	end
 end
-
 local function RepairBlock()
 	-- If the user create new vertex in advance. This operation won't work appropriately.
 	if #BlockSelection == 1 and not BlockSelection.still then
@@ -105,74 +156,77 @@ local function RepairBlock()
 	end
 end
 
--- Bounding Box Centre
-local function GetBlockBBC(blockIndex)
-	local cnt = GetBlockVertexCount(blockIndex)
-	if cnt==0 then return Vec3(0,0,0) end
-	local xmin,xmax,ymin,ymax = 1e39,-1e39,1e39,-1e39
+local function EnterRotation()
+	RB_Block = BlockSelection[1]
+	ShowControl("root", "MEA-BlockSetting", false)
+	local cnt = GetBlockVertexCount(RB_Block)
 	for i=0, cnt-1 do
-		local pos = GetBlockVertexPos(blockIndex, i)
-		xmin = min(xmin, pos.x); xmax = max(xmax, pos.x)
-		ymin = min(ymin, pos.y); ymax = max(ymax, pos.y)
+		RB_Initial[i] = GetBlockVertexPos(RB_Block, i)
 	end
-	return Vec3((xmin+xmax)*0.5, (ymin+ymax)*0.5, 0)
 end
-
 local function ExitRotation()
-	RotateTarget = nil
-	RotateCentre = nil
-	if RCEffectId1 then CancelEffect(RCEffectId1) end
-	if RCEffectId2 then CancelEffect(RCEffectId2) end
-	RCEffectId1, RCEffectId2 = nil, nil
-	if RLEffectId1 then CancelEffect(RLEffectId1) end
-	if RLEffectId2 then CancelEffect(RLEffectId2) end
-	RLEffectId1, RLEffectId2 = nil, nil
-	RotateBaseRad, RotateOriginRad = nil, nil
+	RB_Block = nil
+	RB_Centre = nil
+	if RB_CEffect1 then CancelEffect(RB_CEffect1) end
+	if RB_CEffect2 then CancelEffect(RB_CEffect2) end
+	RB_CEffect1, RB_CEffect2 = nil, nil
+	if RB_LEffect1 then CancelEffect(RB_LEffect1) end
+	if RB_LEffect2 then CancelEffect(RB_LEffect2) end
+	RB_LEffect1, RB_LEffect2 = nil, nil
+	RB_BaseRad, RB_CurrRad = nil, nil
 	if BlockSettingEnabled then
 		ShowControl("root", "MEA-BlockSetting", true)
+	end
+	for k in pairs(RB_Initial) do
+	    RB_Initial[k] = nil
 	end
 end
 
 RegisterEvent("OnDraw", function()
-	if not RotateTarget then
+	if not RB_Block then
 		if GameMode == "Editor" then UpdateBlockSelection() end
 	else
-		-- rotate contre preview
-		if not RotateCentre then
+		-- rotatation centre preview
+		if not RB_Centre then
 			local rcpos
 			if ShiftState then
 				rcpos = ScreenToWorld(GetMousePos())
 			else
 				rcpos = ProcessedMousePos()
 			end
-			rcpos.z = -101
-			if RCEffectId1 then CancelEffect(RCEffectId1) end
-			if RCEffectId2 then CancelEffect(RCEffectId2) end
-			RCEffectId1 = SpawnCircle(rcpos, RotateMinDistance, Colour(255,64,64,255), 1)
-			RCEffectId2 = SpawnCircle(rcpos, 100, Colour(255,64,64,160), 1)
-		-- rotate lines preview
+			rcpos.z = OverTerrainZ
+			if RB_CEffect1 then CancelEffect(RB_CEffect1) end
+			if RB_CEffect2 then CancelEffect(RB_CEffect2) end
+			RB_CEffect1 = SpawnCircle(rcpos, RB_MinDistance, Colour(255,64,64,255), 1)
+			RB_CEffect2 = SpawnCircle(rcpos, 100, Colour(255,64,64,160), 1)
+		-- rotatation lines preview
 		else
-			local previewRad = GetMouseRadFrom(RotateCentre, RotateMinDistance, 0)
+			local previewRad = GetMouseRadFrom(RB_Centre, RB_MinDistance, 0)
 			-- preview the base line
-			if RLEffectId1 then CancelEffect(RLEffectId1) end
-			local rad = RotateOriginRad or previewRad
-			local target = RotateCentre + Vec3(cos(rad)*RotateLineLength, sin(rad)*RotateLineLength, 0)
-			target.z = -101 -- draw over terrains: z<=-100
-			local rcpos = Vec3(RotateCentre.x,RotateCentre.y,-101)
-			RLEffectId1 = SpawnLine(rcpos, target, Colour(255,255,255,255), 1)
+			local rad = RB_BaseRad or previewRad
+			local target = RB_Centre + Vec3(cos(rad)*RB_LineLength, sin(rad)*RB_LineLength, 0)
+			target.z = OverTerrainZ
+			local rcpos = Vec3(RB_Centre.x,RB_Centre.y,OverTerrainZ)
+			if RB_LEffect1 then CancelEffect(RB_LEffect1) end
+			RB_LEffect1 = SpawnLine(rcpos, target, Colour(255,255,255,255), 1)
 			-- preview the target line
-			if RotateBaseRad then
-				if RLEffectId2 then CancelEffect(RLEffectId2) end
+			if RB_BaseRad then
 				rad = previewRad
-				target = RotateCentre + Vec3(cos(rad)*RotateLineLength, sin(rad)*RotateLineLength, 0)
-				target.z = -101 -- draw over terrains: z<=-100
-				RLEffectId2 = SpawnLine(rcpos, target, Colour(0,0,0,255), 1)
+				target = RB_Centre + Vec3(cos(rad)*RB_LineLength, sin(rad)*RB_LineLength, 0)
+				target.z = OverTerrainZ
+				if RB_LEffect2 then CancelEffect(RB_LEffect2) end
+				RB_LEffect2 = SpawnLine(rcpos, target, Colour(0,0,0,255), 1)
+				-- rotation preview
+				if CtrlState then
+					local targetRad = GetMouseRadFrom(RB_Centre, RB_MinDistance, 0)
+					RotateBlock(RB_Block, RB_Initial, RB_Centre, targetRad-RB_BaseRad)
+				end
 			end
 		end
 	end
 end)
 RegisterEvent("OnKey", function(key, down)
-	if not RotateTarget then return end
+	if not RB_Block then return end
 	if key=="mouse left" and not down then RepairBlock() end
 	-- right click to escape
 	if key=="mouse right" and down then
@@ -180,43 +234,44 @@ RegisterEvent("OnKey", function(key, down)
 		return
 	end
 	-- determine the rotate centre
-	if not RotateCentre then
-		-- by mouse's position, but trigger by (Shift+)Enter
+	if not RB_Centre then
+		-- by mouse's position, but trigger by Enter
 		if key=="enter" and down and not CtrlState then
-			-- Shift will cancel snap
-			-- Note that if your mouse clicking position is snap to a vertex of the target block:
-			-- The vertex will be selected and be moved to mouse position for further mouse click
-			-- So this should be avoided: enter instead
-			if ShiftState then
-				RotateCentre = ScreenToWorld(GetMousePos())
+			-- Alt+Enter: use default: bounding box centre
+			if AltState then
+				RB_Centre = GetBlockBBC(RB_Block)
 			else
-				RotateCentre = ProcessedMousePos()
+				-- Shift will cancel snap
+				-- If your mouse clicking position is snap to a vertex of the target block:
+				-- The vertex will be selected and be moved to mouse position for further mouse click
+				-- So this should be avoided: enter instead
+				if ShiftState then
+					RB_Centre = ScreenToWorld(GetMousePos())
+				else
+					RB_Centre = ProcessedMousePos()
+				end
 			end
 		-- for the reasons above. Left click: exit rotation
 		elseif key=="mouse left" and down then
 			ExitRotation()
-		-- Ctrl+Enter: use default: bounding box centre
-		elseif key=="enter" and down and CtrlState then
-			RotateCentre = GetBlockBBC(RotateTarget)
 		end
 		-- create a circle effect marking the centre's position
-		if RotateCentre then
-			RotateBaseRad, RotateOriginRad = nil, nil
-			local rcpos = Vec3(RotateCentre.x,RotateCentre.y,-101)
-			if RCEffectId1 then CancelEffect(RCEffectId1) end
-			if RCEffectId2 then CancelEffect(RCEffectId2) end
-			RCEffectId1 = SpawnCircle(rcpos, RotateMinDistance, Colour(255,64,64,255), 1)
-			RCEffectId2 = SpawnCircle(rcpos, 100, Colour(255,64,64,160), 1)
+		if RB_Centre then
+			local rcpos = Vec3(RB_Centre.x,RB_Centre.y,OverTerrainZ)
+			if RB_CEffect1 then CancelEffect(RB_CEffect1) end
+			if RB_CEffect2 then CancelEffect(RB_CEffect2) end
+			RB_CEffect1 = SpawnCircle(rcpos, RB_MinDistance, Colour(255,64,64,255), 1)
+			RB_CEffect2 = SpawnCircle(rcpos, 100, Colour(255,64,64,160), 1)
 		end
 	-- determine the rotate base line
-	elseif not RotateBaseRad then
+	elseif not RB_BaseRad then
 		-- use default: x+ direction
 		if key=="enter" and down then
-			RotateBaseRad = 0
-			RotateOriginRad = RotateBaseRad
+			RB_BaseRad = 0
+			RB_CurrRad = RB_BaseRad
 		elseif key=="mouse left" and down then
-			RotateBaseRad = GetMouseRadFrom(RotateCentre, RotateMinDistance, 0)
-			RotateOriginRad = RotateBaseRad
+			RB_BaseRad = GetMouseRadFrom(RB_Centre, RB_MinDistance, 0)
+			RB_CurrRad = RB_BaseRad
 		end
 	-- apply block rotation
 	else
@@ -225,18 +280,12 @@ RegisterEvent("OnKey", function(key, down)
 			ExitRotation()
 		-- apply rotation
 		elseif key=="mouse left" and down then
-			local targetRad = GetMouseRadFrom(RotateCentre, RotateMinDistance, 0)
-			local cnt = GetBlockVertexCount(RotateTarget)
-			for i=0, cnt-1 do
-				local diff = GetBlockVertexPos(RotateTarget, i)-RotateCentre
-				local rad = targetRad - RotateBaseRad
-				local curr = RotateCentre + Vec3(diff.x*cos(rad)-diff.y*sin(rad),diff.x*sin(rad)+diff.y*cos(rad),0)
-				SetBlockVertexPos(RotateTarget, i, curr)
-			end
-			UpdateGroundTriangles()
-			-- automaticly made because of mouse clicking
-			-- MakeUndoLevel()
-			RotateBaseRad = targetRad
+			local targetRad = GetMouseRadFrom(RB_Centre, RB_MinDistance, 0)
+			RotateBlock(RB_Block, RB_Initial, RB_Centre, targetRad - RB_BaseRad)
+			RB_CurrRad = targetRad
+		-- cancel block rotation preview
+		elseif key=="left control" and not down then
+			RotateBlock(RB_Block, RB_Initial, RB_Centre, RB_CurrRad - RB_BaseRad)
 		end
 	end
 end)
@@ -332,8 +381,7 @@ end)
 RegisterControlHandler("MEA-BS_Rotate", function(name, doubleClick)
 	if not ShiftState then RepairBlock() end
 	-- Only one block
-	if #BlockSelection == 1 and doubleClick then
-		RotateTarget = BlockSelection[1]
-		ShowControl("root", "MEA-BlockSetting", false)
+	if #BlockSelection == 1 then
+		EnterRotation()
 	end
 end)

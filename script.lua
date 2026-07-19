@@ -43,18 +43,23 @@ end
 
 CtrlState = false
 ShiftState = false
+AltState = false
 function OnKey(key, down)
 	if down then
 		if key == "left control" then
 			CtrlState = true
 		elseif key == "left shift" then
 			ShiftState = true
+		elseif key == "left alt" then
+			AltState = true
 		end
 	else
 		if key == "left control" then
 			CtrlState = false
 		elseif key == "left shift" then
 			ShiftState = false
+		elseif key == "left alt" then
+			AltState = false
 		end
 	end
 end
